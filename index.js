@@ -25,6 +25,13 @@ async function run() {
         res.send(services)
     })
 
+    app.get('/services-on-homepage', async (req, res) => {
+        const query = {};
+        const cursor = serviceCollection.find(query);
+        const services = await cursor.limit(3).toArray();
+        res.send(services)
+    })
+
 }
 
 run().catch(err => console.error(err))
