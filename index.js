@@ -22,14 +22,14 @@ async function run() {
         // services api
         app.get('/services', async (req, res) => {
             const query = {};
-            const cursor = serviceCollection.find(query);
+            const cursor = serviceCollection.find(query).sort({ insertionTime: -1 });
             const services = await cursor.toArray();
             res.send(services)
         });
 
         app.get('/services-on-homepage', async (req, res) => {
             const query = {};
-            const cursor = serviceCollection.find(query);
+            const cursor = serviceCollection.find(query).sort({ insertionTime: -1 });
             const services = await cursor.limit(3).toArray();
             res.send(services)
         });
@@ -40,6 +40,11 @@ async function run() {
             const service = await serviceCollection.findOne(query);
             res.send(service);
         });
+        app.post('/services', async (req, res) => {
+            const service = req.body;
+            const result = await serviceCollection.insertOne(service);
+            res.send(result);
+        })
         // review api
 
         app.get('/reviews', async (req, res) => {
