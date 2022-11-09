@@ -16,58 +16,70 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@clu
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
 async function run() {
-    const serviceCollection = client.db('photographyServices').collection('services');
-    const reviewCollection = client.db('photographyServices').collection('reviews');
-    // services api
-    app.get('/services', async (req, res) => {
-        const query = {};
-        const cursor = serviceCollection.find(query);
-        const services = await cursor.toArray();
-        res.send(services)
-    });
+    try {
+        const serviceCollection = client.db('photographyServices').collection('services');
+        const reviewCollection = client.db('photographyServices').collection('reviews');
+        // services api
+        app.get('/services', async (req, res) => {
+            const query = {};
+            const cursor = serviceCollection.find(query);
+            const services = await cursor.toArray();
+            res.send(services)
+        });
 
-    app.get('/services-on-homepage', async (req, res) => {
-        const query = {};
-        const cursor = serviceCollection.find(query);
-        const services = await cursor.limit(3).toArray();
-        res.send(services)
-    });
+        app.get('/services-on-homepage', async (req, res) => {
+            const query = {};
+            const cursor = serviceCollection.find(query);
+            const services = await cursor.limit(3).toArray();
+            res.send(services)
+        });
 
-    app.get('/services/:id', async (req, res) => {
-        const id = req.params.id;
-        const query = { _id: ObjectId(id) };
-        const service = await serviceCollection.findOne(query);
-        res.send(service);
-    })
-    // review api
+        app.get('/services/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const service = await serviceCollection.findOne(query);
+            res.send(service);
+        });
+        // review api
 
-    app.get('/reviews', async (req, res) => {
-        let query = {};
-        if (req.query.email) {
-            query = {
-                userEmail: req.query.email
+        app.get('/reviews', async (req, res) => {
+            let query = {};
+            if (req.query.email) {
+                query = {
+                    userEmail: req.query.email
+                }
             }
-        }
-        const cursor = reviewCollection.find(query).sort({ insertionTime: -1 });
-        const reviews = await cursor.toArray();
-        res.send(reviews)
-    })
+            const cursor = reviewCollection.find(query).sort({ insertionTime: -1 });
+            const reviews = await cursor.toArray();
+            res.send(reviews)
+        });
 
-    app.post('/reviews', async (req, res) => {
-        const review = req.body;
-        const result = await reviewCollection.insertOne(review);
-        res.send(result);
-    })
+        app.post('/reviews', async (req, res) => {
+            const review = req.body;
+            const result = await reviewCollection.insertOne(review);
+            res.send(result);
+        });
 
-    app.get('/reviews/:id', async (req, res) => {
-        const id = req.params.id;
-        const query = { service: id };
-        const cursor = reviewCollection.find(query).sort({ insertionTime: -1 });
-        const reviews = await cursor.toArray();
-        res.send(reviews)
-    })
+        app.get('/reviews/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { service: id };
+            const cursor = reviewCollection.find(query).sort({ insertionTime: -1 });
+            const reviews = await cursor.toArray();
+            res.send(reviews)
+        });
+        app.delete('/reviews/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+
+            const result = await reviewCollection.deleteOne(query);
+            res.send(result);
+        })
+
+    }
+    finally {
+
+    }
 }
-
 run().catch(err => console.error(err))
 
 app.get('/', (req, res) => {
