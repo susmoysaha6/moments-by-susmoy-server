@@ -1,4 +1,4 @@
-# Project Name: MOMENTS BY SUSMOY
+# Project Name: MOMENTS BY SUSMOY (Server)
 
 ## Technology Used 
 
